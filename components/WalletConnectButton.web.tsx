@@ -10,7 +10,7 @@ export function WalletConnectButton() {
     setError(null);
 
     try {
-      const { getAppKit } = await import('../appKitConfig');
+      const { getAppKit } = await import('../appKitConfig.web');
       const appKit = getAppKit();
       await appKit.open();
     } catch (cause) {

@@ -29,6 +29,29 @@ const ethereumMainnet: AppKitNetwork = {
   caipNetworkId: 'eip155:1',
 };
 
+const sepolia: AppKitNetwork = {
+  id: 11155111,
+  name: 'Sepolia',
+  nativeCurrency: {
+    name: 'Sepolia Ether',
+    symbol: 'ETH',
+    decimals: 18,
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://ethereum-sepolia-rpc.publicnode.com'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Etherscan',
+      url: 'https://sepolia.etherscan.io',
+    },
+  },
+  chainNamespace: 'eip155',
+  caipNetworkId: 'eip155:11155111',
+};
+
 const storage: Storage = {
   getKeys: async () => [...(await AsyncStorage.getAllKeys())],
   getEntries: async <T>() => {
@@ -36,7 +59,7 @@ const storage: Storage = {
     const entries = await AsyncStorage.multiGet(keys);
 
     return entries.flatMap(([key, value]) =>
-      value === null ? [] : [[key, JSON.parse(value) as T]],
+      value === null ? [] : [[key, JSON.parse(value) as T]]
     );
   },
   getItem: async <T>(key: string) => {
@@ -66,7 +89,7 @@ export const appKit = createAppKit({
     },
   },
   adapters: [new EthersAdapter()],
-  networks: [ethereumMainnet],
+  networks: [ethereumMainnet, sepolia],
   defaultNetwork: ethereumMainnet,
   storage,
   themeMode: 'light',

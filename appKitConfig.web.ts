@@ -1,6 +1,6 @@
 import { EthersAdapter } from '@reown/appkit-adapter-ethers';
 import { createAppKit } from '@reown/appkit/react';
-import { mainnet } from '@reown/appkit/networks';
+import { mainnet, sepolia } from '@reown/appkit/networks';
 
 let appKitInstance: ReturnType<typeof createAppKit> | null = null;
 
@@ -13,7 +13,7 @@ function initializeAppKit() {
 
   appKitInstance = createAppKit({
     adapters: [new EthersAdapter()],
-    networks: [mainnet],
+    networks: [mainnet, sepolia],
     defaultNetwork: mainnet,
     projectId,
     metadata: {

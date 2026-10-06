@@ -31,7 +31,7 @@ export default function RootLayout() {
 
         if (!cancelled) {
           setInitializationError(
-            error instanceof Error ? error.message : 'An unknown initialization error occurred.',
+            error instanceof Error ? error.message : 'An unknown initialization error occurred.'
           );
         }
       });
