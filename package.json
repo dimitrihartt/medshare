@@ -64,7 +64,7 @@
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.4.0",
-    "typescript": "~6.0.3"
+    "typescript": "^5.9.3"
   },
   "overrides": {
     "@walletconnect/universal-provider": "2.25.0"
