@@ -1,7 +1,6 @@
 import '../global.css';
 import { useEffect, useState } from 'react';
-import { AppKit, AppKitProvider } from '@reown/appkit-react-native';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { Stack } from 'expo-router';
@@ -12,19 +11,39 @@ export const unstable_settings = {
 };
 
 type AppKitInstance = typeof import('../appKitConfig').appKit;
+type AppKitComponent = React.ComponentType<Record<string, unknown>>;
+type AppKitProviderComponent = React.ComponentType<{
+  instance: AppKitInstance;
+  children: React.ReactNode;
+}>;
 
 export default function RootLayout() {
+  const isWeb = Platform.OS === 'web';
   const [appKit, setAppKit] = useState<AppKitInstance | null>(null);
+  const [AppKit, setAppKitComponent] = useState<AppKitComponent | null>(null);
+  const [AppKitProvider, setAppKitProviderComponent] =
+    useState<AppKitProviderComponent | null>(null);
   const [initializationError, setInitializationError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isWeb) {
+      return;
+    }
+
     let cancelled = false;
 
-    void import('../appKitConfig')
-      .then(({ appKit: instance }) => {
-        if (!cancelled) {
-          setAppKit(instance);
+    void Promise.all([
+      import('@reown/appkit-react-native'),
+      import('../appKitConfig'),
+    ])
+      .then(([appKitModule, { appKit: instance }]) => {
+        if (cancelled) {
+          return;
         }
+
+        setAppKit(instance);
+        setAppKitComponent(appKitModule.AppKit);
+        setAppKitProviderComponent(appKitModule.AppKitProvider);
       })
       .catch((error: unknown) => {
         console.error('Failed to initialize Reown AppKit.', error);
@@ -39,7 +58,18 @@ export default function RootLayout() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isWeb]);
+
+  if (isWeb) {
+    return (
+      <SafeAreaProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        </Stack>
+      </SafeAreaProvider>
+    );
+  }
 
   if (initializationError) {
     return (
@@ -51,7 +81,7 @@ export default function RootLayout() {
     );
   }
 
-  if (!appKit) {
+  if (!appKit || !AppKit || !AppKitProvider) {
     return (
       <View style={styles.root}>
         <Text>Loading wallet connection...</Text>
